@@ -30,4 +30,4 @@ let user = fetch('https://api.github.com/users/AnnaKots')
     console.log('Нет информации о пользователе');
   }
 })
-.catch(error => console.log(error));
+.catch(error => console.log('Информация о пользователе недоступна!'));
