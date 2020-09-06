@@ -1,17 +1,33 @@
+let date = new Date();
 let userName = prompt('Введите логин GitHub:');
-let user = fetch(`https://api.github.com/users/${userName}`)
+
+const getUser = new Promise((resolve,reject) => {
+  setTimeout(() => userName ? resolve(userName) : reject(alert('Ошибка с пользователем')), 2000);
+})
+
+const getDate = new Promise((resolve,reject) => {
+  setTimeout(() => date ? resolve(date) : reject('Ошибка с датой'), 4000);
+})
+
+Promise.all([getUser, getDate])
+.then(([useNamer, date]) => fetch(`https://api.github.com/users/${userName}`))
   .then((result) => {
+    let preloader = document.getElementById("preloader");
     if (result.ok) {
       return result.json();
     } else {
+      loading = false;
       alert('Информация о пользователе недоступна');
       let error = new Error(result.statusText);
       error.response = result;
       throw error;
     }
+    document.body.classList.remove('loading');
   })
   .then(json => {
     console.log(json);
+
+    preloader.classList.add('loaded');
 
     let img = new Image();
     img.src = json.avatar_url;
@@ -22,7 +38,7 @@ let user = fetch(`https://api.github.com/users/${userName}`)
     wrap.className='wrap';
     let name = document.createElement('a');
     name.className = 'name';
-    name.href = json.html_url;
+    name.href = `https://https://github.com/?username=${json.login}`;
     name.innerHTML = json.name;
     document.body.append(wrap);
     if (json.name != null) {
@@ -39,5 +55,9 @@ let user = fetch(`https://api.github.com/users/${userName}`)
     } else {
       document.body.append('Нет информации о пользователе');
     }
+
+    let currentDate = document.createElement('footer');
+    currentDate.innerHTML = `На дату: ${date.toLocaleDateString()}`;
+    document.body.append(currentDate);
   })
   .catch(error => console.log(error));
